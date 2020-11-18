@@ -17,11 +17,11 @@ public class PetStatsScript : MonoBehaviour
     private float happy = 1;
     private float health = 1;      
     private float sleep = 1;
-    private bool sleeng = false;    
+    private bool sleeping = false;    
     private float timer;    
     void Awake()
     {
-        //UpdateStatsAfterOffline();
+        UpdateStatsAfterOffline();
         //Debug.Log(DateTime.Now.Minute + DateTime.Now.Hour * 60);
     }
     void Update()
@@ -39,19 +39,27 @@ public class PetStatsScript : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
-        //CheckOffline();
+        CheckOffline();
     }
     private void OnApplicationPause(bool pause)
     {
-        //CheckOffline();
+        CheckOffline();
     }
     public void CheckOffline()
     {        
         PlayerPrefs.SetString("LastSession", DateTime.UtcNow.ToString());
-        PlayerPrefs.SetString("Hungry", hungry.ToString());
-        PlayerPrefs.SetString("Happy", happy.ToString());
-        PlayerPrefs.SetString("Health", health.ToString());
-        PlayerPrefs.SetString("Sleep", sleep.ToString());
+        PlayerPrefs.SetFloat("Hungry", hungry);
+        PlayerPrefs.SetFloat("Happy", happy);
+        PlayerPrefs.SetFloat("Health", health);
+        PlayerPrefs.SetFloat("Sleep", sleep);
+        if (sleeping == true)
+        {
+            PlayerPrefs.SetInt("Sleeping", 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt("Sleeping", 0);
+        }        
     }
     public void UpdateStatsAfterOffline()
     {
@@ -64,9 +72,22 @@ public class PetStatsScript : MonoBehaviour
             happy = PlayerPrefs.GetFloat("Happy");
             health = PlayerPrefs.GetFloat("Health");
             sleep = PlayerPrefs.GetFloat("Sleep");
+            sleeping = CheckSleeping();
             ChangeAllStats(minutesOffline);
             ChangeAllColor();
             timer = currentData.Seconds;
+        }
+    }
+    private bool CheckSleeping()
+    {
+        int sleepN = PlayerPrefs.GetInt("Sleeping");
+        if (sleepN == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
     private void ChangeAllStats()
@@ -77,7 +98,7 @@ public class PetStatsScript : MonoBehaviour
         if (happy < 0) happy = 0;
         health -= 1 / (float)(hourToHealth * 60);
         if (health < 0) health = 0;
-        if (sleeng == false)
+        if (sleeping == false)
         {
             sleep -= 1 / (float)(hourToSleep * 60);
             if (sleep < 0) sleep = 0;
@@ -88,7 +109,7 @@ public class PetStatsScript : MonoBehaviour
             if (sleep >= 1)
             {
                 sleep = 1;
-                sleeng = false;
+                sleeping = false;
             }
         }
     }
@@ -100,7 +121,7 @@ public class PetStatsScript : MonoBehaviour
         if (happy < 0) happy = 0;
         health -= multiplication / (float)(hourToHealth * 60);
         if (health < 0) health = 0;
-        if (sleeng == false)
+        if (sleeping == false)
         {
             sleep -= multiplication / (float)(hourToSleep * 60);
             if (sleep < 0) sleep = 0;
@@ -111,7 +132,7 @@ public class PetStatsScript : MonoBehaviour
             if (sleep >= 1)
             {
                 sleep = 1;
-                sleeng = false;
+                sleeping = false;
             }
         }
     }
@@ -174,9 +195,9 @@ public class PetStatsScript : MonoBehaviour
     }
     public void SleepUp()
     {
-        if (sleeng == false)
+        if (sleeping == false)
         {
-            sleeng = true;
+            sleeping = true;
         }
     }
 }
