@@ -8,27 +8,33 @@ public class PetStatsScript : MonoBehaviour
     [SerializeField] private Image happyImg = null;
     [SerializeField] private Image healthImg = null;
     [SerializeField] private Image sleepImg = null;
+    [SerializeField] private GameObject[] pupuObj = null;
     [Header("Hours to stats fall")]
     [SerializeField, Range(1, 24)] private int hourToHungry = 1;
     [SerializeField, Range(1, 24)] private int hourToHappy = 1;
     [SerializeField, Range(1, 24)] private int hourToHealth = 1;
     [SerializeField, Range(1, 24)] private int hourToSleep = 1;
     private float hungry = 1;
+    private float pupu = 0;
     private float happy = 1;
     private float health = 1;      
     private float sleep = 1;
     private bool sleeping = false;    
-    private float timer;    
+    private float timer;
+    private Animator anim = null;
+    public bool Sleeping { get => sleeping; }
     void Awake()
     {
         UpdateStatsAfterOffline();
+        anim = GetComponent<Animator>();
         //Debug.Log(DateTime.Now.Minute + DateTime.Now.Hour * 60);
     }
     void Update()
     {
         if (timer >= 60)
         {
-            ChangeAllStats();
+            ChangeAllStats(1);
+            PupuRespawn();
             ChangeAllColor();
             timer = 0;
         }
@@ -44,6 +50,17 @@ public class PetStatsScript : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         CheckOffline();
+    }
+    private void PupuRespawn()
+    {
+        for (int i = 0; i < pupuObj.Length; i++)
+        {
+            if (pupu > 0.25f)
+            {
+                pupuObj[i].SetActive(true);
+                pupu -= 0.25f;
+            }
+        }
     }
     public void CheckOffline()
     {        
@@ -74,6 +91,7 @@ public class PetStatsScript : MonoBehaviour
             sleep = PlayerPrefs.GetFloat("Sleep");
             sleeping = CheckSleeping();
             ChangeAllStats(minutesOffline);
+            PupuRespawn();
             ChangeAllColor();
             timer = currentData.Seconds;
         }
@@ -89,33 +107,11 @@ public class PetStatsScript : MonoBehaviour
         {
             return false;
         }
-    }
-    private void ChangeAllStats()
-    {
-        hungry -= 1 / (float)(hourToHungry * 60);
-        if (hungry < 0) hungry = 0;
-        happy -= 1 / (float)(hourToHappy * 60);
-        if (happy < 0) happy = 0;
-        health -= 1 / (float)(hourToHealth * 60);
-        if (health < 0) health = 0;
-        if (sleeping == false)
-        {
-            sleep -= 1 / (float)(hourToSleep * 60);
-            if (sleep < 0) sleep = 0;
-        }
-        else
-        {
-            sleep += 10 / (float)(hourToSleep * 60);
-            if (sleep >= 1)
-            {
-                sleep = 1;
-                sleeping = false;
-            }
-        }
-    }
+    }    
     private void ChangeAllStats(int multiplication)
     {
         hungry -= multiplication / (float)(hourToHungry * 60);
+        pupu += multiplication / (float)(hourToHungry * 60);
         if (hungry < 0) hungry = 0;
         happy -= multiplication / (float)(hourToHappy * 60);
         if (happy < 0) happy = 0;
@@ -198,6 +194,23 @@ public class PetStatsScript : MonoBehaviour
         if (sleeping == false)
         {
             sleeping = true;
+            anim.SetBool("Sleep", true);
         }
+        else
+        {
+            sleeping = false;
+            anim.SetBool("Sleep", false);
+        }
+    }
+    public void ClearPupu()
+    {
+        for (int i = 0; i < pupuObj.Length; i++)
+        {
+            if (pupuObj[i].activeSelf == true)
+            {
+                pupuObj[i].SetActive(false);
+                break;
+            }
+        }    
     }
 }

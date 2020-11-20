@@ -8,8 +8,10 @@ public class PetScript : MonoBehaviour
     private Transform[] points = null;
     private Transform currentPoint = null;
     private float currentTimer;
+    private PetStatsScript petStats = null;
     void Start()
-    {        
+    {
+        petStats = GetComponent<PetStatsScript>();
         GetPoints();
         currentPoint = RandomizedNextPoint();
     }
@@ -32,7 +34,7 @@ public class PetScript : MonoBehaviour
     }
     private void MoveToNextPoint()
     {
-        if (currentTimer > timeToWait && currentTimer < timeToWait + timeToNextPoint)
+        if (currentTimer > timeToWait && currentTimer < timeToWait + timeToNextPoint && petStats.Sleeping == false)
         {
             currentTimer += Time.deltaTime;
             transform.position = Vector2.MoveTowards(transform.position, currentPoint.position, moveSpeed * Time.deltaTime);
