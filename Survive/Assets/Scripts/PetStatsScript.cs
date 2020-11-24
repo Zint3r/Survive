@@ -22,7 +22,7 @@ public class PetStatsScript : MonoBehaviour
     private bool sleeping = false;    
     private float timer;
     private Animator anim = null;
-    public bool Sleeping { get => sleeping; }
+    public bool Sleeping { get => sleeping; set => sleeping = value; }
     void Awake()
     {
         UpdateStatsAfterOffline();
