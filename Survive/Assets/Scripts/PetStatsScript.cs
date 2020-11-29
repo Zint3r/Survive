@@ -14,6 +14,16 @@ public class PetStatsScript : MonoBehaviour
     [SerializeField, Range(1, 24)] private int hourToHappy = 1;
     [SerializeField, Range(1, 24)] private int hourToHealth = 1;
     [SerializeField, Range(1, 24)] private int hourToSleep = 1;
+    [SerializeField] private int firstTimeToHeight = 4000;
+    [SerializeField] private int secondTimeToHeight = 6000;
+    enum PetStat
+    {
+        hungry = 1,
+        pupu = 0,
+        happy = 1,
+        health = 1,
+        sleep = 1
+    }
     private float hungry = 1;
     private float pupu = 0;
     private float happy = 1;
@@ -22,11 +32,18 @@ public class PetStatsScript : MonoBehaviour
     private bool sleeping = false;    
     private float timer;
     private Animator anim = null;
+    private DateTime burnDate;
     public bool Sleeping { get => sleeping; set => sleeping = value; }
     void Awake()
     {
         UpdateStatsAfterOffline();
+        CheckBurn();
         anim = GetComponent<Animator>();
+        TimeSpan tos;
+        tos = DateTime.Parse(PlayerPrefs.GetString("LastSession")) - burnDate;
+        Debug.Log(DateTime.Parse(PlayerPrefs.GetString("LastSession")));
+        Debug.Log(burnDate);
+        Debug.Log(tos.TotalMinutes);
         //Debug.Log(DateTime.Now.Minute + DateTime.Now.Hour * 60);
     }
     void Update()
@@ -60,6 +77,18 @@ public class PetStatsScript : MonoBehaviour
                 pupuObj[i].SetActive(true);
                 pupu -= 0.25f;
             }
+        }
+    }
+    public void CheckBurn()
+    {
+        if (PlayerPrefs.HasKey("BurnDate") == true)
+        {
+            burnDate = DateTime.Parse(PlayerPrefs.GetString("BurnDate"));
+        }
+        else
+        {
+            burnDate = DateTime.UtcNow;
+            PlayerPrefs.SetString("BurnDate", DateTime.UtcNow.ToString());
         }
     }
     public void CheckOffline()

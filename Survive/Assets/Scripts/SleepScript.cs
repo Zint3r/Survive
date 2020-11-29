@@ -15,11 +15,13 @@ public class SleepScript : MonoBehaviour
         {
             buttonSleepOff.SetActive(true);
             buttonSleepOn.SetActive(false);
+            StartSleep();
         }
         else
         {
             buttonSleepOff.SetActive(false);
             buttonSleepOn.SetActive(true);
+            StopSleep();
         }        
     }
     public void StartSleep()
