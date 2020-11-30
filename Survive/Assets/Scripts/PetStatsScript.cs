@@ -9,6 +9,7 @@ public class PetStatsScript : MonoBehaviour
     [SerializeField] private Image healthImg = null;
     [SerializeField] private Image sleepImg = null;
     [SerializeField] private GameObject[] pupuObj = null;
+    //[SerializeField] private Animator animToto;
     [Header("Hours to stats fall")]
     [SerializeField, Range(1, 24)] private int hourToHungry = 1;
     [SerializeField, Range(1, 24)] private int hourToHappy = 1;
@@ -33,6 +34,7 @@ public class PetStatsScript : MonoBehaviour
     private float timer;
     private Animator anim = null;
     private DateTime burnDate;
+    private int minutesAtBurn;
     public bool Sleeping { get => sleeping; set => sleeping = value; }
     void Awake()
     {
@@ -41,10 +43,12 @@ public class PetStatsScript : MonoBehaviour
         anim = GetComponent<Animator>();
         TimeSpan tos;
         tos = DateTime.Parse(PlayerPrefs.GetString("LastSession")) - burnDate;
+        minutesAtBurn = (int) tos.TotalMinutes;
         Debug.Log(DateTime.Parse(PlayerPrefs.GetString("LastSession")));
         Debug.Log(burnDate);
         Debug.Log(tos.TotalMinutes);
-        //Debug.Log(DateTime.Now.Minute + DateTime.Now.Hour * 60);
+        AnimationTrigger();
+        CheckSleepAnim();
     }
     void Update()
     {
@@ -160,6 +164,18 @@ public class PetStatsScript : MonoBehaviour
                 sleeping = false;
             }
         }
+        AnimationTrigger();
+    }
+    private void AnimationTrigger()
+    {
+        if (minutesAtBurn >= firstTimeToHeight && minutesAtBurn < secondTimeToHeight)
+        {
+            anim.SetTrigger("Burn1");
+        }
+        else if (minutesAtBurn > secondTimeToHeight)
+        {
+            anim.SetTrigger("Burn2");
+        }
     }
     private void ChangeAllColor()
     {
@@ -229,6 +245,17 @@ public class PetStatsScript : MonoBehaviour
         {
             sleeping = false;
             anim.SetBool("Sleep", false);
+        }
+    }
+    private void CheckSleepAnim()
+    {
+        if (sleeping == false)
+        {            
+            anim.SetBool("Sleep", false);
+        }
+        else
+        {            
+            anim.SetBool("Sleep", true);
         }
     }
     public void ClearPupu()

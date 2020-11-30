@@ -2005,6 +2005,8 @@ MonoBehaviour:
   hourToHappy: 12
   hourToHealth: 24
   hourToSleep: 16
+  firstTimeToHeight: 1084
+  secondTimeToHeight: 1100
 --- !u!95 &1065856567
 Animator:
   serializedVersion: 3
